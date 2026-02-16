@@ -1,0 +1,17 @@
+[project]
+name = "pinch"
+version = "1.0.0"
+description = "Know your limits before they know you. Windows taskbar widget for monitoring Claude usage."
+requires-python = ">=3.10"
+dependencies = [
+    "pystray>=0.19.5",
+    "Pillow>=10.0.0",
+    "certifi>=2024.0.0",
+]
+
+[project.scripts]
+pinch = "pinch.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
