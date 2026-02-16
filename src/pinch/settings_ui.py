@@ -18,7 +18,7 @@ from . import settings
 log = logging.getLogger(__name__)
 
 WIN_W = 360
-WIN_H = 380
+WIN_H = 430
 BG = "#1a1b2e"
 SURFACE = "#12131e"
 BORDER = "#2a2b3d"
