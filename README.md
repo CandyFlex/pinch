@@ -27,7 +27,9 @@ A small taskbar pill that shows your Claude subscription utilization, a live cou
 ## What You See
 
 <p align="center">
-  <img src="docs/screenshots/popup.png" alt="Usage breakdown popup" width="560" />
+  <img src="docs/screenshots/popup.png" alt="Usage breakdown popup" width="280" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/screenshots/settings.png" alt="Settings" width="280" />
 </p>
 
 - **Taskbar pill** — current utilization %, reset countdown, weekly usage. Green/yellow/red at a glance.
@@ -37,10 +39,6 @@ A small taskbar pill that shows your Claude subscription utilization, a live cou
 ---
 
 ## Install
-
-<p align="center">
-  <img src="docs/screenshots/install.png" alt="Three-step install" width="700" />
-</p>
 
 **Run from source** (recommended):
 ```bash
@@ -72,10 +70,6 @@ Pinch reads your existing Claude Code OAuth session automatically. No API keys t
 ---
 
 ## Why This Exists
-
-<p align="center">
-  <img src="docs/screenshots/compare.png" alt="Lightweight vs bloated" width="700" />
-</p>
 
 macOS already has [half a dozen native Claude usage trackers](https://github.com/topics/claude-usage). Windows had almost nothing — one Electron-based widget at 150MB+.
 
