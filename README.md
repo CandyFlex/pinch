@@ -85,6 +85,24 @@ Pinch touches your OAuth token, so you should understand exactly what it does:
 ---
 
 <details>
+<summary><strong>Troubleshooting</strong></summary>
+
+**The pill turned red / shows an error**
+Your OAuth token probably expired. Claude Code tokens last ~24 hours. Pinch will automatically retry a few times, but if it can't recover:
+1. Open Claude Code (or run any `claude` command in your terminal) — this refreshes the token
+2. Right-click the Pinch tray icon → **Reconnect**
+
+That's it. Pinch re-reads the credentials file and picks up the fresh token immediately.
+
+**"No OAuth token — is Claude Code installed?"**
+Pinch reads `~/.claude/.credentials.json`, which Claude Code creates when you authenticate. If this file doesn't exist, [install Claude Code](https://docs.anthropic.com/en/docs/claude-code) and sign in first.
+
+**The pill disappeared from my taskbar**
+It may have been moved to the system tray overflow (the `^` arrow). Look for the Pinch crab icon there. You can drag it back to the taskbar.
+
+</details>
+
+<details>
 <summary><strong>Common Questions</strong></summary>
 
 **Does this work without Claude Code?**
