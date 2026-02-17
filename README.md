@@ -19,12 +19,28 @@
 A small taskbar pill that shows your Claude subscription utilization, a live countdown to your next reset, and your weekly quota — color-coded so you know at a glance whether to keep going or ease up.
 
 <p align="center">
-  <img src="docs/screenshots/demo.gif" alt="Pinch in action" />
+  <img src="docs/screenshots/hero.png" alt="Pinch on the Windows taskbar" width="100%" />
 </p>
 
 ---
 
+## What You See
+
+<p align="center">
+  <img src="docs/screenshots/popup.png" alt="Usage breakdown popup" width="560" />
+</p>
+
+- **Taskbar pill** — current utilization %, reset countdown, weekly usage. Green/yellow/red at a glance.
+- **Detail popup** — click the pill for 5-hour rolling, 7-day Opus, 7-day Sonnet, and extra usage ($) with progress bars and reset timers.
+- **Settings** — right-click the tray icon to adjust polling speed (15s–2min), auto-start with Windows, or test your connection.
+
+---
+
 ## Install
+
+<p align="center">
+  <img src="docs/screenshots/install.png" alt="Three-step install" width="700" />
+</p>
 
 **Run from source** (recommended):
 ```bash
@@ -55,21 +71,11 @@ Pinch reads your existing Claude Code OAuth session automatically. No API keys t
 
 ---
 
-## What You Get
-
-- **Taskbar pill** — current utilization %, reset countdown, weekly usage. Green/yellow/red at a glance.
-- **Detail popup** — click the pill for 5-hour rolling, 7-day Opus, 7-day Sonnet, and extra usage ($) with progress bars and reset timers.
-- **Settings** — right-click the tray icon to adjust polling speed (15s–2min), auto-start with Windows, or test your connection.
+## Why This Exists
 
 <p align="center">
-  <img src="docs/screenshots/popup.png" alt="Detail popup" width="280" />
-  &nbsp;&nbsp;&nbsp;
-  <img src="docs/screenshots/settings.png" alt="Settings" width="280" />
+  <img src="docs/screenshots/compare.png" alt="Lightweight vs bloated" width="700" />
 </p>
-
----
-
-## Why This Exists
 
 macOS already has [half a dozen native Claude usage trackers](https://github.com/topics/claude-usage). Windows had almost nothing — one Electron-based widget at 150MB+.
 
@@ -78,6 +84,10 @@ Pinch is the lightweight alternative: ~2,500 lines of Python, 30MB exe (no Elect
 ---
 
 ## Security & Trust
+
+<p align="center">
+  <img src="docs/screenshots/privacy.png" alt="Privacy first" width="400" />
+</p>
 
 Pinch touches your OAuth token, so you should understand exactly what it does:
 
