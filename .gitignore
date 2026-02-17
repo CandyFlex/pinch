@@ -21,3 +21,6 @@ Desktop.ini
 # Env
 .env
 *.log
+
+# Temp screenshots (real ones live in docs/screenshots/)
+/*.png
