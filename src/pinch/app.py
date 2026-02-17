@@ -75,6 +75,7 @@ class App:
             on_show_details=self._toggle_popup,
             on_show_settings=self._show_settings,
             on_toggle_autostart=self._handle_autostart_toggle,
+            on_reconnect=self._handle_reconnect,
             on_exit=self._shutdown,
             get_autostart_state=is_autostart_enabled,
         )
@@ -114,6 +115,11 @@ class App:
             interval = new_settings.get("poll_interval", 30)
             self._monitor.update_interval(interval)
         log.info("Settings updated")
+
+    def _handle_reconnect(self) -> None:
+        """Force re-read of credentials and immediate re-poll."""
+        if self._monitor:
+            self._monitor.reconnect()
 
     def _handle_autostart_toggle(self) -> None:
         """Toggle Windows auto-start."""

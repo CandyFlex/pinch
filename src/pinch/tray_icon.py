@@ -81,6 +81,7 @@ class TrayIcon:
         on_show_details=None,
         on_show_settings=None,
         on_toggle_autostart=None,
+        on_reconnect=None,
         on_exit=None,
         get_autostart_state=None,
     ) -> None:
@@ -88,6 +89,7 @@ class TrayIcon:
         self._on_show_details = on_show_details
         self._on_show_settings = on_show_settings
         self._on_toggle_autostart = on_toggle_autostart
+        self._on_reconnect = on_reconnect
         self._on_exit = on_exit
         self._get_autostart_state = get_autostart_state
         self._icon: pystray.Icon | None = None
@@ -100,6 +102,7 @@ class TrayIcon:
         """Start the tray icon in a background thread."""
         menu = pystray.Menu(
             pystray.MenuItem("Show Details", self._handle_show_details, default=True),
+            pystray.MenuItem("Reconnect", self._handle_reconnect),
             pystray.MenuItem("Settings...", self._handle_show_settings),
             pystray.MenuItem(
                 "Start with Windows",
@@ -160,6 +163,10 @@ class TrayIcon:
     def _handle_show_settings(self, icon=None, item=None) -> None:
         if self._on_show_settings:
             self._on_show_settings()
+
+    def _handle_reconnect(self, icon=None, item=None) -> None:
+        if self._on_reconnect:
+            self._on_reconnect()
 
     def _handle_toggle_autostart(self, icon=None, item=None) -> None:
         if self._on_toggle_autostart:
