@@ -2,9 +2,6 @@
   <img src="docs/screenshots/banner.png" alt="Pinch" width="100%" />
 </p>
 
-<h1 align="center">Pinch</h1>
-<p align="center">Real-time Claude usage monitor for your Windows taskbar.</p>
-
 <p align="center">
   <a href="../../actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/DarkCandyLord/pinch/release.yml?style=flat-square&label=build" /></a>
   <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/DarkCandyLord/pinch?style=flat-square" /></a>
@@ -14,23 +11,13 @@
   <img src="https://img.shields.io/badge/telemetry-zero-brightgreen?style=flat-square" />
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="Pinch on the Windows taskbar" width="560" />
+</p>
+
 ---
 
 A small taskbar pill that shows your Claude subscription utilization, a live countdown to your next reset, and your weekly quota — color-coded so you know at a glance whether to keep going or ease up.
-
-<p align="center">
-  <img src="docs/screenshots/hero.png" alt="Pinch on the Windows taskbar" width="100%" />
-</p>
-
----
-
-## What You See
-
-<p align="center">
-  <img src="docs/screenshots/popup.png" alt="Usage breakdown popup" width="280" />
-  &nbsp;&nbsp;&nbsp;
-  <img src="docs/screenshots/settings.png" alt="Settings" width="280" />
-</p>
 
 - **Taskbar pill** — current utilization %, reset countdown, weekly usage. Green/yellow/red at a glance.
 - **Detail popup** — click the pill for 5-hour rolling, 7-day Opus, 7-day Sonnet, and extra usage ($) with progress bars and reset timers.
@@ -78,10 +65,6 @@ Pinch is the lightweight alternative: ~2,500 lines of Python, 30MB exe (no Elect
 ---
 
 ## Security & Trust
-
-<p align="center">
-  <img src="docs/screenshots/privacy.png" alt="Privacy first" width="400" />
-</p>
 
 Pinch touches your OAuth token, so you should understand exactly what it does:
 
