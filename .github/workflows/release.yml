@@ -1,0 +1,91 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build exe
+        run: |
+          pyinstaller --onefile --noconsole --name "Pinch" `
+            --paths "src" `
+            --collect-data certifi `
+            --hidden-import pinch `
+            --hidden-import pinch.app `
+            --hidden-import pinch.config `
+            --hidden-import pinch.auth `
+            --hidden-import pinch.usage_api `
+            --hidden-import pinch.usage_monitor `
+            --hidden-import pinch.shared_state `
+            --hidden-import pinch.taskbar_overlay `
+            --hidden-import pinch.tray_icon `
+            --hidden-import pinch.popup_view `
+            --hidden-import pinch.autostart `
+            --hidden-import pinch.theme `
+            --hidden-import pinch.utils `
+            --hidden-import pinch.settings `
+            --hidden-import pinch.settings_ui `
+            --hidden-import pinch.setup_wizard `
+            --hidden-import pystray._win32 `
+            src/run_pinch.py
+
+      - name: Generate SHA256 checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash dist/Pinch.exe -Algorithm SHA256).Hash.ToLower()
+          echo "SHA256=$hash" >> $env:GITHUB_ENV
+          echo "$hash  Pinch.exe" > dist/SHA256SUMS.txt
+          echo "Checksum: $hash"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/Pinch.exe
+            dist/SHA256SUMS.txt
+          body: |
+            ## Pinch ${{ github.ref_name }}
+
+            ### Install
+
+            **Run from source (recommended):**
+            ```
+            git clone https://github.com/DarkCandyLord/pinch.git
+            cd pinch
+            pip install -r requirements.txt
+            python -m pinch
+            ```
+
+            **Or download the exe:**
+            Download `Pinch.exe` below. This binary was built by [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions) from the public source code — not on anyone's personal machine.
+
+            ### Verify
+
+            ```
+            SHA256: ${{ env.SHA256 }}
+            ```
+
+            PowerShell: `Get-FileHash Pinch.exe -Algorithm SHA256`
+
+            ### What's New
+            See [CHANGELOG](https://github.com/DarkCandyLord/pinch/commits/${{ github.ref_name }})
+          generate_release_notes: true
