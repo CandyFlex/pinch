@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <a href="../../actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/DarkCandyLord/pinch/release.yml?style=flat-square&label=build" /></a>
-  <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/DarkCandyLord/pinch?style=flat-square" /></a>
-  <img src="https://img.shields.io/github/downloads/DarkCandyLord/pinch/total?style=flat-square&label=downloads" />
+  <a href="../../actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/CandyFlex/pinch/release.yml?style=flat-square&label=build" /></a>
+  <a href="../../releases/latest"><img src="https://img.shields.io/github/v/release/CandyFlex/pinch?style=flat-square" /></a>
+  <img src="https://img.shields.io/github/downloads/CandyFlex/pinch/total?style=flat-square&label=downloads" />
   <img src="https://img.shields.io/badge/platform-Windows-0078D4?style=flat-square&logo=windows&logoColor=white" />
-  <img src="https://img.shields.io/github/license/DarkCandyLord/pinch?style=flat-square" />
+  <img src="https://img.shields.io/github/license/CandyFlex/pinch?style=flat-square" />
   <img src="https://img.shields.io/badge/telemetry-zero-brightgreen?style=flat-square" />
 </p>
 
@@ -29,7 +29,7 @@ A small taskbar pill that shows your Claude subscription utilization, a live cou
 
 **Run from source** (recommended):
 ```bash
-git clone https://github.com/DarkCandyLord/pinch.git
+git clone https://github.com/CandyFlex/pinch.git
 cd pinch
 pip install -r requirements.txt
 python -m pinch
@@ -131,5 +131,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome — especially for Linux/mac
 ---
 
 <p align="center">
-  <sub>MIT License · Built by <a href="https://github.com/DarkCandyLord">DarkCandyLord</a></sub>
+  <sub>MIT License · Built by <a href="https://github.com/CandyFlex">CandyFlex</a></sub>
 </p>

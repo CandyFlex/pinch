@@ -12,7 +12,7 @@ APP_REGISTRY_VALUE = "Pinch"
 USAGE_API_URL = "https://api.anthropic.com/api/oauth/usage"
 OAUTH_BETA_HEADER = "oauth-2025-04-20"
 POLL_INTERVAL_SECONDS = 30
-TASKBAR_REPOSITION_SECONDS = 5
+TASKBAR_REPOSITION_SECONDS = 1
 
 # Credentials
 CREDENTIALS_PATH = Path.home() / ".claude" / ".credentials.json"

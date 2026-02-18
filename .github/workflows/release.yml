@@ -69,7 +69,7 @@ jobs:
 
             **Run from source (recommended):**
             ```
-            git clone https://github.com/DarkCandyLord/pinch.git
+            git clone https://github.com/CandyFlex/pinch.git
             cd pinch
             pip install -r requirements.txt
             python -m pinch
@@ -87,5 +87,5 @@ jobs:
             PowerShell: `Get-FileHash Pinch.exe -Algorithm SHA256`
 
             ### What's New
-            See [CHANGELOG](https://github.com/DarkCandyLord/pinch/commits/${{ github.ref_name }})
+            See [CHANGELOG](https://github.com/CandyFlex/pinch/commits/${{ github.ref_name }})
           generate_release_notes: true

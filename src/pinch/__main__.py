@@ -5,8 +5,20 @@ SECURITY MODEL:
 - Only usage percentages and reset times are displayed.
 """
 
+import ctypes
 import logging
 import sys
+
+
+def _enable_dpi_awareness() -> None:
+    """Tell Windows we handle DPI ourselves so coordinates aren't virtualized."""
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
+    except (AttributeError, OSError):
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()  # Win8.1 fallback
+        except (AttributeError, OSError):
+            pass
 
 
 def _setup_logging(verbose: bool = False) -> None:
@@ -33,6 +45,9 @@ def main() -> None:
 
     verbose = "--verbose" in args or "-v" in args
     _setup_logging(verbose)
+
+    # DPI awareness must be set before any window creation
+    _enable_dpi_awareness()
 
     if "--test-api" in args:
         _test_api()

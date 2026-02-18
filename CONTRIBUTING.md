@@ -5,7 +5,7 @@ Pinch is open source under the MIT License. Contributions are welcome.
 ## Quick Start
 
 ```bash
-git clone https://github.com/DarkCandyLord/pinch.git
+git clone https://github.com/CandyFlex/pinch.git
 cd pinch
 pip install -r requirements.txt
 python -m pinch

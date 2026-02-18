@@ -29,9 +29,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/DarkCandyLord/pinch"
-Repository = "https://github.com/DarkCandyLord/pinch"
-Issues = "https://github.com/DarkCandyLord/pinch/issues"
+Homepage = "https://github.com/CandyFlex/pinch"
+Repository = "https://github.com/CandyFlex/pinch"
+Issues = "https://github.com/CandyFlex/pinch/issues"
 
 [project.gui-scripts]
 pinch = "pinch.__main__:main"

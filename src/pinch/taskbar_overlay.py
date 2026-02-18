@@ -19,6 +19,31 @@ log = logging.getLogger(__name__)
 GWL_EXSTYLE = -20
 WS_EX_TOOLWINDOW = 0x00000080
 WS_EX_NOACTIVATE = 0x08000000
+HWND_TOPMOST = -1
+SWP_NOMOVE = 0x0002
+SWP_NOSIZE = 0x0001
+SWP_NOACTIVATE = 0x0010
+SWP_SHOWWINDOW = 0x0040
+GA_ROOT = 2  # GetAncestor: top-level owner window
+
+# Visibility recovery
+SW_SHOWNOACTIVATE = 8
+
+# Foreground event hook — reacts immediately when another window takes focus
+EVENT_SYSTEM_FOREGROUND = 0x0003
+WINEVENT_OUTOFCONTEXT = 0x0000
+
+# Callback type for SetWinEventHook
+WINEVENTPROC = ctypes.WINFUNCTYPE(
+    None,
+    ctypes.wintypes.HANDLE,   # hWinEventHook
+    ctypes.wintypes.DWORD,    # event
+    ctypes.wintypes.HWND,     # hwnd
+    ctypes.c_long,            # idObject
+    ctypes.c_long,            # idChild
+    ctypes.wintypes.DWORD,    # dwEventThread
+    ctypes.wintypes.DWORD,    # dwmsEventTime
+)
 
 # Transparent color key for rounded corners
 TRANSPARENT_COLOR = "#ff00ff"
@@ -96,13 +121,12 @@ class TaskbarOverlay:
 
         # Make it a tool window (hidden from Alt-Tab)
         self._root.update_idletasks()
-        hwnd = ctypes.windll.user32.GetParent(self._root.winfo_id())
-        if not hwnd:
-            hwnd = int(self._root.frame(), 16) if hasattr(self._root, 'frame') else 0
-        if hwnd:
-            style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+        self._hwnd = self._acquire_hwnd()
+        log.info("Overlay HWND: 0x%X", self._hwnd)
+        if self._hwnd:
+            style = ctypes.windll.user32.GetWindowLongW(self._hwnd, GWL_EXSTYLE)
             style = style | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
-            ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+            ctypes.windll.user32.SetWindowLongW(self._hwnd, GWL_EXSTYLE, style)
 
         # Canvas for the rounded pill
         self._canvas = tk.Canvas(
@@ -137,9 +161,39 @@ class TaskbarOverlay:
         # Countdown refresh every 30s so the timer stays current
         self._root.after(30_000, self._refresh_countdown)
 
+    def _acquire_hwnd(self) -> int:
+        """Reliably get the Win32 HWND for this overlay window."""
+        user32 = ctypes.windll.user32
+        frame_id = self._root.winfo_id()
+
+        # Best: GetAncestor with GA_ROOT returns the actual top-level window
+        hwnd = user32.GetAncestor(frame_id, GA_ROOT)
+        if hwnd:
+            return hwnd
+
+        # Fallback: GetParent
+        hwnd = user32.GetParent(frame_id)
+        if hwnd:
+            return hwnd
+
+        # Last resort: the frame id itself
+        return frame_id
+
     def _initial_draw(self) -> None:
         self._draw_pill()
         self._position_on_taskbar()
+
+        # Re-acquire HWND after window is fully realized (sometimes
+        # the HWND changes after the first geometry call)
+        new_hwnd = self._acquire_hwnd()
+        if new_hwnd != self._hwnd:
+            log.info("HWND updated after draw: 0x%X -> 0x%X", self._hwnd, new_hwnd)
+            self._hwnd = new_hwnd
+
+        # Install foreground event hook — reacts instantly when any
+        # window takes focus (e.g. fullscreen Chrome, games) so we
+        # can re-assert TOPMOST without waiting for the 1s poll
+        self._install_foreground_hook()
 
     def _handle_click(self, event=None) -> None:
         if self._on_click:
@@ -271,10 +325,78 @@ class TaskbarOverlay:
         y = tb_top + (tb_height - h) // 2
         self._root.geometry(f"{w}x{h}+{x}+{y}")
 
+    def _install_foreground_hook(self) -> None:
+        """Install a Windows event hook that fires when ANY window gets focus.
+
+        This lets us re-assert TOPMOST immediately (within ~50ms) instead
+        of waiting for the 1-second polling loop.  Handles fullscreen apps,
+        game launches, maximized Chrome, etc.
+        """
+        def _on_foreground(hWinEventHook, event, hwnd, idObject,
+                           idChild, dwEventThread, dwmsEventTime):
+            # Schedule on tkinter main thread
+            try:
+                self._root.after(50, self._force_topmost)
+            except Exception:
+                pass  # window may be destroyed during shutdown
+
+        # prevent garbage collection of the C callback
+        self._fg_hook_cb = WINEVENTPROC(_on_foreground)
+
+        self._fg_hook = ctypes.windll.user32.SetWinEventHook(
+            EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
+            0,                      # hmodWinEventProc (0 = out-of-context)
+            self._fg_hook_cb,
+            0, 0,                   # all processes, all threads
+            WINEVENT_OUTOFCONTEXT,
+        )
+        if self._fg_hook:
+            log.info("Foreground event hook installed (hook=%d)", self._fg_hook)
+        else:
+            log.warning("Failed to install foreground event hook")
+
+    def _force_topmost(self) -> None:
+        """Force the window back to TOPMOST z-order via Win32 API.
+
+        tkinter's -topmost can be demoted by fullscreen apps (Chrome, games).
+        This directly calls SetWindowPos to re-assert topmost every cycle,
+        checks IsWindowVisible and forces show if the window got hidden,
+        and re-applies tkinter's topmost as belt-and-suspenders.
+        """
+        hwnd = self._hwnd
+        if not hwnd:
+            hwnd = self._acquire_hwnd()
+            if hwnd:
+                self._hwnd = hwnd
+                log.info("Re-acquired HWND: 0x%X", hwnd)
+
+        if hwnd:
+            user32 = ctypes.windll.user32
+
+            # If the window got hidden (withdrawn by parent, etc.), force it visible
+            if not user32.IsWindowVisible(hwnd):
+                log.debug("Overlay hidden — forcing ShowWindow")
+                user32.ShowWindow(hwnd, SW_SHOWNOACTIVATE)
+
+            # Re-assert TOPMOST z-order
+            user32.SetWindowPos(
+                hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+            )
+
+        # Belt and suspenders: re-apply tkinter topmost + ensure visible
+        try:
+            self._root.deiconify()
+            self._root.attributes("-topmost", True)
+            self._root.lift()
+        except tk.TclError:
+            pass
+
     def _reposition_loop(self) -> None:
-        """Periodically re-check taskbar position."""
+        """Periodically re-check taskbar position and force z-order."""
         try:
             self._position_on_taskbar()
+            self._force_topmost()
         except Exception as exc:
             log.debug("Reposition error: %s", exc)
         self._root.after(TASKBAR_REPOSITION_SECONDS * 1000, self._reposition_loop)
