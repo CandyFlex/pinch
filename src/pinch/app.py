@@ -32,9 +32,11 @@ class App:
         """Start all components and enter the main loop."""
         log.info("Starting Pinch")
 
-        # Tk root (hidden — overlay draws its own window)
+        # Root IS the overlay window — no parent-child hierarchy.
+        # This prevents z-order issues where a withdrawn parent
+        # drags its child overlay behind other windows.
         self._root = tk.Tk()
-        self._root.withdraw()
+        self._root.withdraw()  # hidden during wizard, overlay shows it
 
         # First-run wizard if no settings exist
         if not settings.exists():
@@ -48,26 +50,22 @@ class App:
         # Load settings
         s = settings.load()
 
-        # Create a separate toplevel for the overlay
-        overlay_win = tk.Toplevel(self._root)
-        overlay_win.withdraw()
-
-        # Popup view
+        # Popup view (creates its own Toplevel when shown)
         self._popup = PopupView(self._root, self._state)
 
-        # Settings window
+        # Settings window (creates its own Toplevel when shown)
         self._settings_ui = SettingsUI(
             self._root,
             on_settings_changed=self._on_settings_changed,
         )
 
-        # Taskbar overlay
+        # Taskbar overlay — root becomes the overlay directly
         self._overlay = TaskbarOverlay(
-            overlay_win,
+            self._root,
             self._state,
             on_click=self._toggle_popup,
         )
-        overlay_win.deiconify()
+        self._root.deiconify()
 
         # System tray icon
         self._tray = TrayIcon(
@@ -129,6 +127,9 @@ class App:
     def _shutdown(self) -> None:
         """Clean shutdown of all components."""
         log.info("Shutting down...")
+        # Unhook Windows events FIRST to prevent callbacks into dead objects
+        if self._overlay:
+            self._overlay.destroy()
         if self._monitor:
             self._monitor.stop()
         if self._tray:

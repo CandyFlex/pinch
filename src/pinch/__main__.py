@@ -23,11 +23,23 @@ def _enable_dpi_awareness() -> None:
 
 def _setup_logging(verbose: bool = False) -> None:
     level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    fmt = "%(asctime)s [%(name)s] %(levelname)s: %(message)s"
+    datefmt = "%H:%M:%S"
+
+    # Console handler
+    logging.basicConfig(level=level, format=fmt, datefmt=datefmt)
+
+    # File handler — always logs to pinch.log next to the script
+    # so we can diagnose crashes after the fact
+    from pathlib import Path
+    log_path = Path(__file__).resolve().parent.parent.parent / "pinch.log"
+    try:
+        fh = logging.FileHandler(str(log_path), mode="w", encoding="utf-8")
+        fh.setLevel(logging.DEBUG)
+        fh.setFormatter(logging.Formatter(fmt, datefmt=datefmt))
+        logging.getLogger().addHandler(fh)
+    except OSError:
+        pass  # can't write log file — not fatal
 
 
 def main() -> None:
